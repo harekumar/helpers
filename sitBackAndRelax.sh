@@ -3,7 +3,7 @@
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 BLUE='\033[0;34m'
-GREEN='\033[0;39m'
+GREEN='\033[0;32m'
 
 #Define all constants
 MYSQL_START_CONST='sudo /usr/local/mysql-5.6.25-osx10.8-x86_64/support-files/mysql.server start'
@@ -13,6 +13,7 @@ KAFKA_LOCATION='/Users/hare.kumar/apps/kafka_2.10-0.8.2.0'
 KAFKA_START='./bin/kafka-server-start.sh -daemon config/server.properties'
 WORKING_DIRECTORY='/Users/hare.kumar/Documents/workspace/shopo-tomcat'
 TOMCAT_SERVER_DIRECTORY='/Users/hare.kumar/opt'
+EJABBERD_LOCATION='/Applications/ejabberd-15.04'
 
 echo "${RED}****** SETTING UP YOUR WORKSPACE. SIT BACK AND RELAX | I WILL DO THE REST *****${NC}"
 echo
@@ -49,6 +50,10 @@ cd "$KAFKA_LOCATION"
 $KAFKA_START
 echo "kafka & zookeeper started successfully"
 
+echo "3. Starting ejabberd server"
+cd $EJABBERD_LOCATION
+./bin/ejabberdctl start
+
 echo "3. Updating git repositories code base "
 cd "$WORKING_DIRECTORY"
 echo "Updating & building client first"
@@ -77,12 +82,13 @@ echo "Starting tomcat server"
 
 read -p "Do you wish to see logs file for starting tomcat server?(Y|N) Logs will be visible for 20 seconds only." answer
 
+cd $TOMCAT_SERVER_DIRECTORY
 for d in tomcat-*/;
 do
     echo $d
     cd $d
     ./bin/catalina.sh start
-    
+
     if [ "$answer" == "Y" ]
     then
         tail -f logs/catalina.out &
@@ -91,5 +97,5 @@ do
         kill $tailpid
     fi
     cd ..
-    done
+done
 echo "${GREEN}**************** END OF SCRIPT *****************${NC}"
