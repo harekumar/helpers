@@ -20,7 +20,22 @@ echo
 
 fetchAndBuild() 
 {
+
+    echo "$1 --> $2 --> $3"
+
     cd "$(pwd)/$1"
+    
+    ## If user provides current branch 
+    if [ ! -z "$3" ];
+    then
+        echo "running git fetch --all"
+        git fetch --all
+        echo "checking out to branch $3"
+        git checkout $3
+    else
+        echo "Third parameter missing. Hence proceeding with default current branch"
+    fi
+
     GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
     echo "${RED}######## Pulling from git branch $GIT_BRANCH ######${NC}"
     git pull origin $GIT_BRANCH
@@ -58,9 +73,12 @@ echo "3. Updating git repositories code base "
 cd "$WORKING_DIRECTORY"
 echo "Updating & building client first"
 
+GIT_BRANCH_OF_CHOICE=$1
+echo "GIT BRANCH OF YOUR CHOICE $GIT_BRANCH_OF_CHOICE"
+
 for directory in *Client/;
 do
-    fetchAndBuild $directory install
+    fetchAndBuild $directory install $GIT_BRANCH_OF_CHOICE
 done
 echo "Yay! ALL clients fetched & installed succesfully"
 
@@ -71,7 +89,7 @@ do
     then
         echo "Skipping git pull & mvn clean package for $directory"
     else
-        fetchAndBuild $directory package
+        fetchAndBuild $directory package $GIT_BRANCH_OF_CHOICE
     fi
 done
 
