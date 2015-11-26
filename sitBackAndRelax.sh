@@ -32,14 +32,20 @@ fetchAndBuild()
         git fetch --all
         echo "checking out to branch $3"
         git checkout $3
+        ret=$?
+        if [[ "$ret" != 0 ]]; then
+            echo "Checking out to recently modified branch"
+            RECENTLY_MODIFIED_BRANCH=$(git for-each-ref --count=1 --sort=-committerdate refs/heads/ --format='%(refname:short)')
+            git checkout $RECENTLY_MODIFIED_BRANCH
+        fi
     else
-        echo "Third parameter missing. Hence proceeding with default current branch"
+        echo "Third parameter missing. Hence proceeding with default current branch."
+        GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
+        echo "${RED}######## Pulling from git branch $GIT_BRANCH ######${NC}"
+        git pull origin $GIT_BRANCH
     fi
 
-    GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD)
-    echo "${RED}######## Pulling from git branch $GIT_BRANCH ######${NC}"
-    git pull origin $GIT_BRANCH
-    echo "${BLUE}running mvn clean install${NC}"
+    echo "${BLUE}running mvn clean $2 ${NC}"
     mvn clean $2
     if [ "$?" -ne 0 ]; then
         echo "Maven clean $2 unsuccessful"
