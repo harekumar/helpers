@@ -8,10 +8,10 @@ GREEN='\033[0;32m'
 #Define all constants
 MYSQL_START_CONST='sudo /usr/local/mysql-5.6.25-osx10.8-x86_64/support-files/mysql.server start'
 ZK_LOCATION='/Users/hare.kumar/apps/zookeeper-3.4.6'
-ZK_START='./bin/zkServer.sh start'
+ZK_START='sudo ./bin/zkServer.sh start'
 KAFKA_LOCATION='/Users/hare.kumar/apps/kafka_2.10-0.8.2.0'
 KAFKA_START='./bin/kafka-server-start.sh -daemon config/server.properties'
-WORKING_DIRECTORY='/Users/hare.kumar/Documents/workspace/shopo-tomcat'
+WORKING_DIRECTORY_TOMCAT='/Users/hare.kumar/Documents/workspace/shopo-tomcat'
 TOMCAT_SERVER_DIRECTORY='/Users/hare.kumar/opt'
 EJABBERD_LOCATION='/Applications/ejabberd-15.04'
 
@@ -32,6 +32,7 @@ fetchAndBuild()
         git fetch --all
         echo "checking out to branch $3"
         git checkout $3
+        git pull origin $3
         ret=$?
         if [[ "$ret" != 0 ]]; then
             echo "Checking out to recently modified branch"
@@ -76,13 +77,13 @@ cd $EJABBERD_LOCATION
 ./bin/ejabberdctl start
 
 echo "3. Updating git repositories code base "
-cd "$WORKING_DIRECTORY"
+cd "$WORKING_DIRECTORY_TOMCAT"
 echo "Updating & building client first"
 
 GIT_BRANCH_OF_CHOICE=$1
 echo "GIT BRANCH OF YOUR CHOICE $GIT_BRANCH_OF_CHOICE"
 
-for directory in *Client/;
+for directory in *lient/;
 do
     fetchAndBuild $directory install $GIT_BRANCH_OF_CHOICE
 done
