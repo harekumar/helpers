@@ -10,7 +10,7 @@ USER_REMOTE_HOME_DIRECTORY='/home/hk15052'
 REMOTE_USER_NAME='hk15052'
 LOCAL_BEAM_FILE_DIRECTORY='/Users/hare.kumar/Documents/workspace/shopochat-erl/ebin'
 
-DEPLOY_SCRIPT="sudo cp $USER_REMOTE_HOME_DIRECTORY/*.beam $REMOTE_APP_DIRECTORY/lib/ejabberd-15.04/ebin/ && echo 'Hard restarting ejabberd' && cd  /apps/ejabberd-15.04/ && sudo ./bin/ejabberdctl restart && tail -f logs/ejabberd.log"
+DEPLOY_SCRIPT="deploy_script.sh"
 
 scpAndSsh() {
     
@@ -28,11 +28,11 @@ scpAndSsh() {
     do
         # ssh hk15052@52.74.132.72
         echo "ssh to $host"
-        ssh -t $REMOTE_USER_NAME@$host sudo ./deploy_script.sh 
+        ssh -t $REMOTE_USER_NAME@$host sudo ./$DEPLOY_SCRIPT $2 
 
     done
 
-    echo "${GREEN}********* DEPLOYMENT SUCCESS ********** ${NC}"
+    echo "${GREEN}********* DEPLOYMENT ON $ENV FINISHED ********** ${NC}"
 }
 
 ENV=$1
@@ -49,10 +49,10 @@ echo "${RED}selected enviorment $ENV ${NC}"
 
 if [ "$ENV" = "dev" ]; then
     echo "Deploying on development enviornment"
-    scpAndSsh ${dev[@]}
+    scpAndSsh ${dev[@]} $2
 elif [ "$ENV" = "staging" ]; then
     echo "Deploying on staging enviornment" 
-    scpAndSsh ${staging[@]}
+    scpAndSsh ${staging[@]} $2
 else
     echo "You must provide the env details to deploy"
 fi
